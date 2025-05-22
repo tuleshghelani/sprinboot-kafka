@@ -22,18 +22,22 @@ public class KafkaProducer {
 	private String topic;
 	
 	public void send(String data) {
-		LOG.info("Sending data: {}", data);
-		
-		CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, data);
-		
-		future.whenComplete((result, ex) -> {
-			if (ex == null) {
-				LOG.info("Successfully sent message: [{}] with offset: [{}]", 
-						data, result.getRecordMetadata().offset());
-			} else {
-				LOG.error("Failed to send message: [{}]", data, ex);
-			}
-		});
+		try {
+			LOG.info("Sending data: {}", data);
+			
+			CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, data);
+			
+			future.whenComplete((result, ex) -> {
+				if (ex == null) {
+					LOG.info("Successfully sent message: [{}] with offset: [{}]", 
+							data, result.getRecordMetadata().offset());
+				} else {
+					LOG.error("Failed to send message: [{}]", data, ex);
+				}
+			});
+		} catch (Exception e) {
+			LOG.error("Failed to send message to Kafka: {}", e.getMessage());
+		}
 	}
 
 }

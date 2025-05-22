@@ -37,6 +37,8 @@ public class KafkaConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        // Disable idempotence to work with older Kafka versions
+        configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, false);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
@@ -75,6 +77,12 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic topic() {
-        return new NewTopic(topic, 1, (short) 1);
+        try {
+            return new NewTopic("mytopic-test", 1, (short) 1);
+        } catch (Exception e) {
+            // Log exception but allow application to start
+            System.out.println("Could not create Kafka topic, but allowing application to start");
+            return null;
+        }
     }
 } 

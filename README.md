@@ -12,3 +12,6 @@ Simple example apache kafka using springboot and rest
 	
 4. Receive message on consumer  
 	Open new tab on your browser then type http://localhost:8080/trim/kafka/consumer
+
+
+docker run -p 2181:2181 -p 9092:9092 --name kafka-zookeeper --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 spotify/kafka
