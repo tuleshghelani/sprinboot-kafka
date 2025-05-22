@@ -15,3 +15,8 @@ Simple example apache kafka using springboot and rest
 
 
 docker run -p 2181:2181 -p 9092:9092 --name kafka-zookeeper --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 spotify/kafka
+
+
+docker start kafka-zookeeper
+
+docker run -p 2181:2181 -p 9092:9092 --name kafka-zookeeper-new --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 spotify/kafka

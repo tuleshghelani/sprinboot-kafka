@@ -3,6 +3,7 @@ package com.trim.kafkarest.controller;
 import com.trim.kafkarest.dto.MessageDTO;
 import com.trim.kafkarest.model.Message;
 import com.trim.kafkarest.services.KafkaProducer;
+import com.trim.kafkarest.services.KafkaReaderService;
 import com.trim.kafkarest.storages.MessageStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,13 @@ public class WebRestController {
 			.getLogger(WebRestController.class);
 
 	@Autowired
-	KafkaProducer kafkaProducer;
+	private KafkaProducer kafkaProducer;
+	
+	@Autowired
+	private KafkaReaderService kafkaReaderService;
 
 	@Autowired
-	MessageStorage storage;
+	private MessageStorage storage;
 
 	@GetMapping(value = "/producer")
 	public String producer(@RequestParam("data") String data) {
@@ -43,13 +47,17 @@ public class WebRestController {
 
 	@GetMapping(value = "/consumer")
 	public String consumer() {
-		String messages = storage.toString();
-		return messages;
+		// Read directly from Kafka instead of storage
+		List<Message> messages = kafkaReaderService.readMessages();
+		StringBuilder sb = new StringBuilder();
+		messages.forEach(msg -> sb.append(msg).append("<br/>"));
+		return sb.toString();
 	}
 
 	@GetMapping(value = "/messages")
 	public ResponseEntity<List<Message>> getAllMessages() {
-		return new ResponseEntity<>(storage.getMessages(), HttpStatus.OK);
+		// Read directly from Kafka instead of storage
+		return new ResponseEntity<>(kafkaReaderService.readMessages(), HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/messages")
