@@ -2,6 +2,7 @@ package com.trim.kafkarest.controller;
 
 import com.trim.kafkarest.dto.MessageDTO;
 import com.trim.kafkarest.model.Message;
+import com.trim.kafkarest.services.KafkaAdminService;
 import com.trim.kafkarest.services.KafkaProducer;
 import com.trim.kafkarest.services.KafkaReaderService;
 import com.trim.kafkarest.storages.MessageStorage;
@@ -29,6 +30,9 @@ public class WebRestController {
 
 	@Autowired
 	private MessageStorage storage;
+	
+	@Autowired
+	private KafkaAdminService kafkaAdminService;
 
 	@GetMapping(value = "/producer")
 	public String producer(@RequestParam("data") String data) {
@@ -62,8 +66,11 @@ public class WebRestController {
 
 	@DeleteMapping(value = "/messages")
 	public ResponseEntity<String> clearMessages() {
+		// Delete messages from Kafka
+		kafkaAdminService.deleteAllMessages();
+		// Also clear local storage
 		storage.clear();
-		return new ResponseEntity<>("All messages cleared", HttpStatus.OK);
+		return new ResponseEntity<>("All messages cleared from Kafka and local storage", HttpStatus.OK);
 	}
 
 }
